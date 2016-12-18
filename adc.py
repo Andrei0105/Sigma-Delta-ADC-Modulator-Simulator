@@ -128,7 +128,7 @@ def previousstep(textSumator, textIntegrator, textComparator, textDac,
 def replength(stream):
     repetitionlength = 1
     maxlength = int(len(stream) / 2)
-    for x in range(2, maxlength):
+    for x in range(2, maxlength + 1):
         if stream[0:x] == stream[x:2*x] :
             repetitionlength = x
     return repetitionlength
@@ -195,7 +195,7 @@ def process(textSumator, textIntegrator, textComparator, textDac,
                  if reptimes < 2 or repetitionlen == 1:
                      res=1
                  for y in range(0, reptimes-2):
-                     if bitstream[x*repetitionlen:(x+1)*repetitionlen] != bitstream[(x+1)*repetitionlen:(x+2)*repetitionlen]:
+                     if bitstream[y*repetitionlen:(y+1)*repetitionlen] != bitstream[(y+1)*repetitionlen:(y+2)*repetitionlen]:
                          res = 1 #not repeating
 
                  if currentrepetitionlen % repetitionlen != 0:
