@@ -17,6 +17,7 @@ listnofones = []
 listofreplen = []
 listcurrentgenval = []
 lastmodifiedvalue = 0
+stepnobeforenext128 = 0
 
 def reset(textSumator, textIntegrator, textComparator, textDac,
               textBoxVin, textBoxDac, textAdcOut, textRepetare,
@@ -59,6 +60,13 @@ def reset(textSumator, textIntegrator, textComparator, textDac,
 
 def waitforstopinput(tkFrame):
     tkFrame.after_cancel(afterid)
+
+def next128steps(tkFrame):
+    global stepnobeforenext128
+    stepnobeforenext128 = x
+    afterid = tkFrame.after(0, lambda: process(tkFrame.textSumator, tkFrame.textIntegrator, tkFrame.textComparator, tkFrame.textDac,
+                    tkFrame.textBoxVin, tkFrame.textBoxDac, tkFrame.textAdcOut, tkFrame.textRepetare, tkFrame.textOnes, tkFrame.sliderInterval, tkFrame.textBitStream, tkFrame, "next128"))
+
 
 def previousstep(textSumator, textIntegrator, textComparator, textDac,
                     textBitStream, textRepetare, textOnes, textAdcOut):
@@ -218,6 +226,7 @@ def process(textSumator, textIntegrator, textComparator, textDac,
              textRepetare['text'] = "Repetition length: " +  str(repetitionlen)
              textComparator.config(fg='red')
              textIntegrator.config(fg='black')
+             textBitStream.tag_delete("rep")
              textBitStream.tag_add("rep", "1.0", "1."+str(repetitionlen))
              textBitStream.tag_config("rep", background="red", foreground="white")
              currentstep += 1
@@ -232,6 +241,11 @@ def process(textSumator, textIntegrator, textComparator, textDac,
          if simtype=="continuous":
             afterid = tkFrame.after(sliderInterval.get(), lambda: process(textSumator, textIntegrator, textComparator, textDac,
                             textBoxVin, textBoxDac, textAdcOut, textRepetare, textOnes, sliderInterval, textBitStream, tkFrame, simtype))
+         if simtype=="next128":
+            afterid = tkFrame.after(0, lambda: process(textSumator, textIntegrator, textComparator, textDac,
+                            textBoxVin, textBoxDac, textAdcOut, textRepetare, textOnes, sliderInterval, textBitStream, tkFrame, simtype))
+            if x==stepnobeforenext128+128:
+                tkFrame.after_cancel(afterid)
          x = x + 1
 
 def sigmadelta():
@@ -349,6 +363,9 @@ def sigmadelta():
                                                             tkFrame.textOnes,
                                                             tkFrame.textAdcOut))
     tkFrame.buttonPrev.place(x = 366, y= 340)
+
+    tkFrame.buttonNext128 = Button( text="Next 128 steps", command=lambda:next128steps(tkFrame))
+    tkFrame.buttonNext128.place(x = 300, y= 370)
 
     tkFrame.textInterval = Label(text = "Simulation step(ms)", font=("Helvetica", 11))
     tkFrame.textInterval.place(x = 5, y=265)
